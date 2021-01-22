@@ -216,7 +216,7 @@ void SingleMuTrigEff(int nevt=-1, bool isMC = false, int kTrigSel = 14, int hiHF
   else if(hiHFBinEdge==-1) fCentSelHF = "HFDown";
   TFile* newfile;
   
-  newfile = new TFile(Form("MBPD_Ev6p7M_TrigAccEfficiencty_TrigNum_%d.root",kTrigSel),"recreate");
+  newfile = new TFile(Form("MBPD_Ev6p7M_TrigEff_L%d_v2.root",(int) (kTrigSel-11)),"recreate");
 
  // const static int nMaxDimu = 1000;
  // int evt;
@@ -303,24 +303,31 @@ void SingleMuTrigEff(int nevt=-1, bool isMC = false, int kTrigSel = 14, int hiHF
   if(nevt == -1) nevt = mytree->GetEntries();
 
   cout << "Total events = " << nevt << endl;
+  TH1D* onebin = new TH1D("one", "onebin", 4,1,4);
+  TH1D* md = new TH1D("md", "massdist",60, 2.7,3.3);
+  int den1=0, den2=0,  den3=0, den4=0;
+  int num1=0, num2=0, num3=0, num4=0;
   
-  Double_t BINMAP[15] = {0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5.5, 7.5, 9.5, 13, 20};
+  Double_t BINMAP1[11] = {3.5, 4, 4.5, 5, 5.5, 6.5, 8., 10.5, 14, 18, 30};
+  Double_t BINMAP2[11] = {2.07, 3.0, 3.5, 4, 4.5, 5., 6., 7.5, 10, 15, 30};
+  Double_t BINMAP3[12] = {1.5, 2.5, 3, 3.5, 4, 4.5, 5.5, 6.5, 8, 9.5, 13, 20};
+  Double_t BINMAP4[10] = {1.5, 2.2, 2.7, 3.2, 3.7, 4.7, 6.5, 8.5, 11, 20};
 
-  TH1D* h11 = new TH1D("h11","Denom;counts",14, BINMAP);
+  TH1D* h11 = new TH1D("h11","Denom;counts",10, BINMAP1);
   h11->Sumw2();
-  TH1D* h21 = new TH1D("h21","Num;counts", 14, BINMAP);
+  TH1D* h21 = new TH1D("h21","Num;counts", 10, BINMAP1);
   h21->Sumw2();
-  TH1D* h12 = new TH1D("h12","Denom;counts",14, BINMAP);
+  TH1D* h12 = new TH1D("h12","Denom;counts",10, BINMAP2);
   h12->Sumw2();
-  TH1D* h22 = new TH1D("h22","Num;counts", 14, BINMAP);
+  TH1D* h22 = new TH1D("h22","Num;counts", 10, BINMAP2);
   h22->Sumw2();
-  TH1D* h13 = new TH1D("h13","Denom;counts",14, BINMAP);
+  TH1D* h13 = new TH1D("h13","Denom;counts",11, BINMAP3);
   h13->Sumw2();
-  TH1D* h23 = new TH1D("h23","Num;counts", 14, BINMAP);
+  TH1D* h23 = new TH1D("h23","Num;counts", 11, BINMAP3);
   h23->Sumw2();
-  TH1D* h14 = new TH1D("h14","Denom;counts",14, BINMAP);
+  TH1D* h14 = new TH1D("h14","Denom;counts",9, BINMAP4);
   h14->Sumw2();
-  TH1D* h24 = new TH1D("h24","Num;counts", 14, BINMAP);
+  TH1D* h24 = new TH1D("h24","Num;counts", 9, BINMAP4);
   h24->Sumw2();
 
   Double_t epr[5] = {0.0, 1.2, 1.8, 2.1, 2.4};
@@ -333,6 +340,7 @@ void SingleMuTrigEff(int nevt=-1, bool isMC = false, int kTrigSel = 14, int hiHF
 
     mytree->GetEntry(iev);
   
+    bool jpsiEvent = false;
     cBin = getHiBinFromhiHF(SumET_HF);
     for (Int_t irqq=0; irqq<Reco_QQ_size; ++irqq){
       if (!(Reco_QQ_sign[irqq]==0)) continue; 
@@ -344,62 +352,76 @@ void SingleMuTrigEff(int nevt=-1, bool isMC = false, int kTrigSel = 14, int hiHF
       float mueta1 = mupl_Reco->Eta();
       float mueta2 = mumi_Reco->Eta();
       float mass_dimu = JP_Reco->M();
-      if( Reco_QQ_VtxProb[irqq] < 0.01) continue;
-      if (!(mass_dimu < 3.2 && mass_dimu > 2.9)) continue;
+
+      if( Reco_QQ_VtxProb[irqq] <= 0.01) continue;
+      if (!(mass_dimu < 3.3 && mass_dimu > 2.7)) continue;
       if(!(cBin <180)) continue;
-      if(accmatch(mueta1, mupt1)){
+      if(accmatch(mueta1, mupt1)&& accmatch(mueta2, mupt2)){
 	if(( (mupt1 > ptc[0] )&&(TMath::Abs(mueta1)<=epr[1] && TMath::Abs(mueta1)>=epr[0]) )){
-	h11->Fill(mupt1);
-	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))) h21->Fill(mupt1);
+	h11->Fill(mupt1); den1++;
+	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))){ h21->Fill(mupt1); num1++;}
 	}
 	if(( (mupt1 > ptc[1] )&&(TMath::Abs(mueta1)<=epr[2] && TMath::Abs(mueta1)>= epr[1]) )){
-	h12->Fill(mupt1);
-	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))) h22->Fill(mupt1);
+	h12->Fill(mupt1); den2++;
+	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))){ h22->Fill(mupt1); num2++;}
 	}
 	if(( (mupt1 > ptc[2] )&&(TMath::Abs(mueta1)<= epr[3] && TMath::Abs(mueta1)>=epr[2]) )){
-	h13->Fill(mupt1);
-	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))) h23->Fill(mupt1);
+	h13->Fill(mupt1); den3++;
+	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))){ h23->Fill(mupt1); num3++;}
 	}
 	if(( (mupt1 > ptc[3] )&&(TMath::Abs(mueta1)<= epr[4] && TMath::Abs(mueta1)>= epr[3] ) )){
-	h14->Fill(mupt1);
-	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))) h24->Fill(mupt1);
+	h14->Fill(mupt1); den4++;
+	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))){ h24->Fill(mupt1); num4++;}
 	}
-      }
-
-      if(accmatch(mueta2,mupt2)){
 	if(( (mupt2 > ptc[0] )&&(TMath::Abs(mueta2)<=epr[1] && TMath::Abs(mueta2)>=epr[0]) )){
-	h11->Fill(mupt2);
-	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))) h21->Fill(mupt2);
+	h11->Fill(mupt2); den1++;
+	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))){ h21->Fill(mupt2); num1++;}
 	}
 	if(( (mupt2 > ptc[1] )&&(TMath::Abs(mueta2)<=epr[2] && TMath::Abs(mueta2)>= epr[1]) )){
-	h12->Fill(mupt2);
-	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))) h22->Fill(mupt2);
+	h12->Fill(mupt2); den2++;
+	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))){ h22->Fill(mupt2); num2++; }
 	}
 	if(( (mupt2 > ptc[2] )&&(TMath::Abs(mueta2)<= epr[3] && TMath::Abs(mueta2)>=epr[2]) )){
-	h13->Fill(mupt2);
-	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))) h23->Fill(mupt2);
+	h13->Fill(mupt2); den3++;
+	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))){ h23->Fill(mupt2); num3++; }
 	}
 	if(( (mupt2 > ptc[3] )&&(TMath::Abs(mueta2)<= epr[4] && TMath::Abs(mueta2)>= epr[3] ) )){
-	h14->Fill(mupt2);
-	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))) h24->Fill(mupt2);
+	h14->Fill(mupt2); den4++;
+	if(((Reco_mu_trig[Reco_QQ_mupl_idx[irqq]]&((ULong64_t)pow(2,kTrigSel))) == ((ULong64_t)pow(2, kTrigSel)))){ h24->Fill(mupt2); num4++;}
 	}
+        md->Fill(mass_dimu);
       }
     }
   } //end of event loop
 //  mmtree->Write();  // Don't need to call Write() for trees 
+  double div1, div2, div3, div4;
+  div1= ((double)num1/(double)den1);
+  div2= ((double)num2/(double)den2);
+  div3= ((double)num3/(double)den3);
+  div4= ((double)num4/(double)den4);
   TH1D* hc1 = (TH1D*) h21->Clone("hc1");
   TH1D* hc2 = (TH1D*) h22->Clone("hc2");
   TH1D* hc3 = (TH1D*) h23->Clone("hc3");
   TH1D* hc4 = (TH1D*) h24->Clone("hc4");
+  onebin->SetBinContent(1,div1);
+  onebin->SetBinContent(2,div2);
+  onebin->SetBinContent(3,div3);
+  onebin->SetBinContent(4,div4);
   hc1->Divide(h11); 
   hc2->Divide(h12); 
   hc3->Divide(h13); 
   hc4->Divide(h14); 
   newfile->cd();
-  h11->Write();h21->Write();hc1->Write();
-  h12->Write();h22->Write();hc2->Write();
-  h13->Write();h23->Write();hc3->Write();
-  h14->Write();h24->Write();hc4->Write();
+  hc1->SetName("hEff1");
+  hc2->SetName("hEff2");
+  hc3->SetName("hEff3");
+  hc4->SetName("hEff4");
+  hc1->Write();/* h11->Write();h21->Write();*/
+  hc2->Write();/* h12->Write();h22->Write();*/
+  hc3->Write();/* h13->Write();h23->Write();*/
+  hc4->Write();/* h14->Write();h24->Write();*/
+  md->Write();
+  onebin->Write();
   newfile->Close();
     
 } 

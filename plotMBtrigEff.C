@@ -1,22 +1,18 @@
-#include <TROOT.h>
 #include <TFile.h>
-#include <iostream>
-#include <string>
-#include <TLatex.h>
-#include <TH1D.h>
+#include "Style_soohwan.h"
 
 void plotMBtrigEff(){
-  TFile* fT13 = new TFile("MBPD_Ev6p7M_TrigAccEfficiencty_TrigNum_13.root","read");
-  TFile* fT14 = new TFile("MBPD_Ev6p7M_TrigAccEfficiencty_TrigNum_14.root","read");
+  TFile* fT13 = new TFile("MBPD_Ev6p7M_TrigEff_L2_v2.root","read");
+  TFile* fT14 = new TFile("MBPD_Ev6p7M_TrigEff_L3_v2.root","read");
   
-  TH1D* ht13p1 = (TH1D*) fT13->Get("hc1");
-  TH1D* ht13p2 = (TH1D*) fT13->Get("hc2");
-  TH1D* ht13p3 = (TH1D*) fT13->Get("hc3");
-  TH1D* ht13p4 = (TH1D*) fT13->Get("hc4");
-  TH1D* ht14p1 = (TH1D*) fT14->Get("hc1");
-  TH1D* ht14p2 = (TH1D*) fT14->Get("hc2");
-  TH1D* ht14p3 = (TH1D*) fT14->Get("hc3");
-  TH1D* ht14p4 = (TH1D*) fT14->Get("hc4");
+  TH1D* ht13p1 = (TH1D*) fT13->Get("hEff1");
+  TH1D* ht13p2 = (TH1D*) fT13->Get("hEff2");
+  TH1D* ht13p3 = (TH1D*) fT13->Get("hEff3");
+  TH1D* ht13p4 = (TH1D*) fT13->Get("hEff4");
+  TH1D* ht14p1 = (TH1D*) fT14->Get("hEff1");
+  TH1D* ht14p2 = (TH1D*) fT14->Get("hEff2");
+  TH1D* ht14p3 = (TH1D*) fT14->Get("hEff3");
+  TH1D* ht14p4 = (TH1D*) fT14->Get("hEff4");
   Double_t epr[5] = {0.0, 1.2, 1.8, 2.1, 2.4};
   Double_t ptc[4] = {3.5, 2.1, 1.5, 1.5};
   ht13p1->GetYaxis()->SetRangeUser(0,1);
@@ -27,6 +23,15 @@ void plotMBtrigEff(){
   ht14p2->GetYaxis()->SetRangeUser(0,1);
   ht14p3->GetYaxis()->SetRangeUser(0,1);
   ht14p4->GetYaxis()->SetRangeUser(0,1);
+
+  ht13p1->GetXaxis()->SetRangeUser(0,30);
+  ht13p2->GetXaxis()->SetRangeUser(0,30);
+  ht13p3->GetXaxis()->SetRangeUser(0,30);
+  ht13p4->GetXaxis()->SetRangeUser(0,30);
+  ht14p1->GetXaxis()->SetRangeUser(0,30);
+  ht14p2->GetXaxis()->SetRangeUser(0,30);
+  ht14p3->GetXaxis()->SetRangeUser(0,30);
+  ht14p4->GetXaxis()->SetRangeUser(0,30);
 
   ht13p1->GetXaxis()->SetTitle("p_{T} (GeV/c)");
   ht13p2->GetXaxis()->SetTitle("p_{T} (GeV/c)");
@@ -46,10 +51,7 @@ void plotMBtrigEff(){
   ht14p3->GetYaxis()->SetTitle("Single #mu Eff.");
   ht14p4->GetYaxis()->SetTitle("Single #mu Eff.");
 
-  gStyle->SetOptStat(0);
-  gStyle->SetHistLineColor(kBlack);
-  gStyle->SetHistTopMargin(0.03);
-  gStyle->SetOptTitle(0);
+  custom::SetgStyle();
 
   TCanvas *c1, *c2;
   c1 = new TCanvas("c1","Jpsi L2 Filter Eff",1600,1200);
@@ -113,7 +115,7 @@ void plotMBtrigEff(){
   ht14p3->SetMarkerColor(kRed);
   ht14p3->Draw("pe");
   lum->DrawLatex(0.60,0.45,"CMS #it{Internal}");lum->DrawLatex(0.55,0.93,"PbPb #sqrt{s_{NN}} = 5.02 TeV");	
-  ds->DrawLatex(0.57, 0.40,"Data L3 Jpsi Trigger Efficiency"); ds->DrawLatex(0.60, 0.35,Form("(p_{T}^{#mu}>%.1f, |#eta| #in [%.1f, %.1f])",ptc[2],epr[0],epr[3]));
+  ds->DrawLatex(0.57, 0.40,"Data L3 Jpsi Trigger Efficiency"); ds->DrawLatex(0.60, 0.35,Form("(p_{T}^{#mu}>%.1f, |#eta| #in [%.1f, %.1f])",ptc[2],epr[2],epr[3]));
   c2->cd(4);
   ht14p4->SetMarkerSize(1);
   ht14p4->SetMarkerStyle(kCircle);
@@ -124,6 +126,6 @@ void plotMBtrigEff(){
   c1->Draw();
   c2->Draw();
 
-  c1->SaveAs("plotEff_MBPD_JpsiL2.pdf");
-  c2->SaveAs("plotEff_MBPD_JpsiL3.pdf");
+  c1->SaveAs("plotEff_MBPD_JpsiL2_v2.pdf");
+  c2->SaveAs("plotEff_MBPD_JpsiL3_v2.pdf");
 }
