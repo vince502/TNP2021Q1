@@ -216,7 +216,7 @@ void SingleMuTrigEff(int nevt=-1, bool isMC = false, int kTrigSel = 14, int hiHF
   else if(hiHFBinEdge==-1) fCentSelHF = "HFDown";
   TFile* newfile;
   
-  newfile = new TFile(Form("MBPD_Ev6p7M_TrigEff_L%d_v2.root",(int) (kTrigSel-11)),"recreate");
+  newfile = new TFile(Form("MBPD_Ev6p7M_TrigEff_L%d_v3.root",(int) (kTrigSel-11)),"recreate");
 
  // const static int nMaxDimu = 1000;
  // int evt;
@@ -354,7 +354,7 @@ void SingleMuTrigEff(int nevt=-1, bool isMC = false, int kTrigSel = 14, int hiHF
       float mass_dimu = JP_Reco->M();
 
       if( Reco_QQ_VtxProb[irqq] <= 0.01) continue;
-      if (!(mass_dimu < 3.3 && mass_dimu > 2.7)) continue;
+      if (!(mass_dimu < 3.19 && mass_dimu > 3)) continue;//v2 : 2.7~3.3, v3: 3~3.19
       if(!(cBin <180)) continue;
       if(accmatch(mueta1, mupt1)&& accmatch(mueta2, mupt2)){
 	if(( (mupt1 > ptc[0] )&&(TMath::Abs(mueta1)<=epr[1] && TMath::Abs(mueta1)>=epr[0]) )){

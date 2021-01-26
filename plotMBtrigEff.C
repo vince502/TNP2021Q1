@@ -2,8 +2,8 @@
 #include "Style_soohwan.h"
 
 void plotMBtrigEff(){
-  TFile* fT13 = new TFile("MBPD_Ev6p7M_TrigEff_L2_v2.root","read");
-  TFile* fT14 = new TFile("MBPD_Ev6p7M_TrigEff_L3_v2.root","read");
+  TFile* fT13 = new TFile("MBPD_Ev6p7M_TrigEff_L2_v3.root","read");
+  TFile* fT14 = new TFile("MBPD_Ev6p7M_TrigEff_L3_v3.root","read");
   
   TH1D* ht13p1 = (TH1D*) fT13->Get("hEff1");
   TH1D* ht13p2 = (TH1D*) fT13->Get("hEff2");
@@ -126,6 +126,6 @@ void plotMBtrigEff(){
   c1->Draw();
   c2->Draw();
 
-  c1->SaveAs("plotEff_MBPD_JpsiL2_v2.pdf");
-  c2->SaveAs("plotEff_MBPD_JpsiL3_v2.pdf");
+  c1->SaveAs("plotEff_MBPD_JpsiL2_v3.pdf");
+  c2->SaveAs("plotEff_MBPD_JpsiL3_v3.pdf");
 }
