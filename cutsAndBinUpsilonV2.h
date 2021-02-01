@@ -11,7 +11,6 @@
 #include <TLine.h>
 #include <TMath.h>
 #include <TTree.h>
-#include <math.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <TROOT.h>
